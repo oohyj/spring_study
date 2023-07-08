@@ -1,11 +1,19 @@
 package hello.core.order;
 
+import hello.core.annotation.MainDiscountPolicy;
 import hello.core.discount.DiscountPolicy;
 import hello.core.discount.FixDiscountPolicy;
 import hello.core.discount.RateDiscountPolicy;
 import hello.core.member.Member;
 import hello.core.member.MemberRepository;
+import hello.core.member.MemberServiceImpl;
 import hello.core.member.MemoryMemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+@Component
 
 public class OrderServiceImpl implements OrderService{
     //구체적인 클래스에 대해서 OrderServiceImpl은 전혀 모름
@@ -14,9 +22,11 @@ public class OrderServiceImpl implements OrderService{
     //private final DiscountPolicy  discountPolicy = new RateDiscountPolicy();
 
 
-    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+    @Autowired
+    public OrderServiceImpl(MemberRepository memberRepository ,  @MainDiscountPolicy DiscountPolicy discountPolicy){
+
         this.memberRepository = memberRepository;
-        this.discountPolicy = discountPolicy;
+        this.discountPolicy =discountPolicy;
     }
 
     //주문 생성 요청이 오면
@@ -28,5 +38,10 @@ public class OrderServiceImpl implements OrderService{
         //할인 정책에다가 회원을 넘기는 거임 뭘 넘길지는 내가 고민을 하면 됨
         int discountPrice =discountPolicy.discount(member,itemPrice);
         return new Order(memberId , itemName , itemPrice, discountPrice);
+    }
+
+    //테스트용
+    public MemberRepository getMemberRepository(){
+        return memberRepository;
     }
 }
